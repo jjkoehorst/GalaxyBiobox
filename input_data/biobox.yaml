@@ -1,0 +1,7 @@
+---
+version: "0.9.0"
+arguments:
+  - fastq:
+    - id: "test_reads"
+      type: "paired"
+      value: "/bbx/input/reads.fq.gz"
