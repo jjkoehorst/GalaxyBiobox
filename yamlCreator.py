@@ -6,6 +6,17 @@ from shutil import copyfile
 global arguments
 arguments = {}
 
+global assemblers
+#This can be a file...
+assemblers = ["bioboxes/velvet",
+			  "bioboxes/megahit",
+			  "bioboxes/sga",
+			  "bioboxes/idba",
+			  "bioboxes/minia",
+			  "bioboxes/ray",
+			  "bioboxes/sparse",
+			  "bioboxes/soap"]
+
 def yamlCreator():
 	#Valid yaml creation
 	data = dict(
@@ -33,35 +44,7 @@ def folderPath(folder):
 	#Otherwise append the path of the script to the current folder location of the script
 	return os.path.dirname(os.path.realpath(__file__)) + folder
 
-def assemblerSelection():
-	#This can be a file...
-	assemblers = ["bioboxes/velvet",
-				  "bioboxes/megahit",
-				  "bioboxes/sga",
-				  "bioboxes/idba",
-				  "bioboxes/minia",
-				  "bioboxes/ray",
-				  "bioboxes/sparse",
-				  "bioboxes/soap"]
-
-	if "--assembler" not in sys.argv:
-		print "Use --assembler to select your assembler"
-		print "Currently supported assemblers:"
-		print '\n'.join(assemblers)
-		sys.exit()
-
-	selection = sys.argv[sys.argv.index("--assembler")+1]
-
-	if selection not in assemblers and "--force" not in sys.argv:
-		print "Currently supported assemblers:"
-		print '\n'.join(assemblers)
-		print "To force your public docker use --force"
-		sys.exit()
-
-	return selection
-
 def runDocker():
-	assembler = assemblerSelection()
 	output = open("docker.sh", "w")
 
 	#INPUT needs to be the folder...
@@ -71,7 +54,7 @@ docker run \
 --volume="'''+arguments["yaml"]+''':/bbx/input/biobox.yaml:ro" \
 --volume="'''+arguments["output"]+''':/bbx/output/:rw" \
 --rm \
-'''+assembler+''' \
+'''+arguments["assembler"]+''' \
 default
 '''
 	output.write(bash)
@@ -82,11 +65,6 @@ default
 
 def test():
 	arguments["fastq"] = os.path.abspath("myReadFolder/reads.fq.gz")
-	arguments["output"] = os.path.abspath("test")
-	arguments["yaml"] = arguments["output"]+"/biobox.yaml"
-	#IF output folder does not exist yet...
-	if not os.path.isdir(arguments["output"]):
-		os.mkdir(arguments["output"])
 	arguments["id"] = "TEST"
 	arguments["fasta"] = "myTestResult.fa"
 
@@ -101,24 +79,35 @@ def test():
 				  "bioboxes/soap"]
 
 	for assembler in assemblers:
+		arguments["output"] = os.path.abspath("test/"+assembler)
+		arguments["yaml"] = arguments["output"]+"/biobox.yaml"
+		#IF output folder does not exist yet...
+		if not os.path.isdir(arguments["output"]):
+			os.makedirs(arguments["output"])
+
 		arguments["assembler"] = assembler
 		arguments["type"] = "single"
-		assemblerSelection()
 		yamlCreator()
 		runDocker()
 
 	for assembler in assemblers:
+		arguments["output"] = os.path.abspath("test/"+assembler)
+		arguments["yaml"] = arguments["output"]+"/biobox.yaml"
+		#IF output folder does not exist yet...
+		if not os.path.isdir(arguments["output"]):
+			os.makedirs(arguments["output"])
+
 		arguments["assembler"] = assembler
 		arguments["type"] = "paired"
-		assemblerSelection()
 		yamlCreator()
 		runDocker()
-
 
 if __name__ == '__main__':
 	if "--test" in sys.argv:
 		print("PERFORMING TESTS")
 		test()
+		# soap needs fragment size
+		sys.exit()
 
 	if "--fastq" not in sys.argv:
 		print("--fastq FASTQ required")
@@ -149,6 +138,20 @@ if __name__ == '__main__':
 		sys.exit()
 	else:
 		arguments["id"] = sys.argv[sys.argv.index("--id")+1]
+
+	if "--assembler" not in sys.argv:
+		print "Use --assembler to select your assembler"
+		print "Currently supported assemblers:"
+		print '\n'.join(assemblers)
+		sys.exit()
+	else:
+		arguments["assembler"] = sys.argv[sys.argv.index("--assembler")+1]
+
+	if arguments["assembler"] not in assemblers and "--force" not in sys.argv:
+		print "Currently supported assemblers:"
+		print '\n'.join(assemblers)
+		print "To force your public docker use --force"
+		sys.exit()
 
 	assemblerSelection()
 	yamlCreator()
