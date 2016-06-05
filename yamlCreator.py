@@ -7,7 +7,7 @@ global arguments
 arguments = {}
 
 def yamlCreator():
-	# This creates a YAML file without - and is not valid for biobox
+	#Valid yaml creation
 	data = dict(
 		version = "0.9.0",
 		arguments = [dict(
@@ -63,8 +63,6 @@ def assemblerSelection():
 def runDocker():
 	assembler = assemblerSelection()
 	output = open("docker.sh", "w")
-
-	#Should we create a symbolic link to FASTQ on different location?
 
 	#INPUT needs to be the folder...
 	bash = '''
