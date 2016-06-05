@@ -71,7 +71,7 @@ def runDocker():
 docker run \
 --volume="'''+arguments["fastq"]+''':/bbx/input/reads.fq.gz:ro" \
 --volume="'''+arguments["yaml"]+''':/bbx/input/biobox.yaml:ro" \
---volume="'''+arguments["tmp"]+''':/bbx/output/:rw" \
+--volume="'''+arguments["output"]+''':/bbx/output/:rw" \
 --rm \
 '''+assembler+''' \
 default
@@ -90,16 +90,16 @@ if __name__ == '__main__':
 		#Get complete path of input file
 		arguments["fastq"] = os.path.abspath(sys.argv[sys.argv.index("--fastq")+1])
 
-	if "--tmp" not in sys.argv:
-		print("--tmp folder required")
+	if "--output" not in sys.argv:
+		print("--output folder required")
 		sys.exit()
 	else:
 		#Get complete path of output folder
-		arguments["tmp"] = os.path.abspath(sys.argv[sys.argv.index("--tmp")+1])
-		arguments["yaml"] = arguments["tmp"]+"/biobox.yaml"
+		arguments["output"] = os.path.abspath(sys.argv[sys.argv.index("--output")+1])
+		arguments["yaml"] = arguments["output"]+"/biobox.yaml"
 		#IF output folder does not exist yet...
-		if not os.path.isdir(arguments["tmp"]):
-			os.mkdir(arguments["tmp"])
+		if not os.path.isdir(arguments["output"]):
+			os.mkdir(arguments["output"])
 
 	if "--type" not in sys.argv:
 		print("--type paired/single required")
@@ -112,20 +112,6 @@ if __name__ == '__main__':
 		sys.exit()
 	else:
 		arguments["id"] = sys.argv[sys.argv.index("--id")+1]
-
-	if "--output" not in sys.argv:
-		print("--output folder required")
-		sys.exit()
-	else:
-		#Get complete path of output folder
-		arguments["output"] = os.path.abspath(sys.argv[sys.argv.index("--output")+1])
-		#IF output folder does not exist yet... create it
-		if not os.path.isdir(arguments["output"]):
-			os.mkdir(arguments["output"])
-
-	# if "--assembler" not in sys.argv:
-	# else:
-		# arguments["assembler"] = sys.argv[sys.argv.index("--assembler")+1]
 
 	assemblerSelection()
 	yamlCreator()
