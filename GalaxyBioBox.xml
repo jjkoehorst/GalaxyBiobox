@@ -1,0 +1,55 @@
+<tool id="BioBoXes" name="BioboXes" version="1.0.0">
+	<description>BioBox Galaxy Interface</description>
+	<command interpreter="python">yamlCreator.py
+									'--fastq' '$ifastq'
+									'--output' 'tmpOutPutFolder'
+									'--assembler' '$assembler' 
+									'--version' '$version' 
+									'--fasta' '$fasta'
+	</command>
+	<inputs>
+		<param name="fastq" type="data" format="fastq" label="FASTQ reads for assembly" />
+		<param name="assembler" type="select" multiple="True" display="checkboxes" label="Assembler selection">
+			<option value="short_read_assembler bioboxes/velvet">velvet</option>
+			<option value="short_read_assembler bioboxes/megahit">megahit</option>
+			<option value="short_read_assembler bioboxes/sga">SGA</option>
+			<option value="short_read_assembler bioboxes/idba">IDBA</option>
+			<option value="short_read_assembler bioboxes/minia">minia</option>
+			<option value="short_read_assembler bioboxes/ray">ray</option>
+			<option value="short_read_assembler bioboxes/sparse">sparse</option>
+			<option value="short_read_assembler bioboxes/soap">soap</option>
+		</param>
+		<param name="version" type="select" label="Version selection">
+			<option value="0.9.0">Biobox 0.9.0</option>
+		</param>
+	</inputs>
+	<outputs>
+		<data format="fasta" name="FastaLocation" label="Assembled: ${input.name}" />
+	</outputs>
+
+	<help>
+		Assembly suite using the BioBox interface
+	</help>
+
+	<citations>
+		<citation type="bibtex">@Article{Belmann2015,
+			author="Belmann, Peter
+			and Dr{\"o}ge, Johannes
+			and Bremges, Andreas
+			and McHardy, Alice C.
+			and Sczyrba, Alexander
+			and Barton, Michael D.",
+			title="Bioboxes: standardised containers for interchangeable bioinformatics software",
+			journal="GigaScience",
+			year="2015",
+			volume="4",
+			number="1",
+			pages="1--4",
+			abstract="Software is now both central and essential to modern biology, yet lack of availability, difficult installations, and complex user interfaces make software hard to obtain and use. Containerisation, as exemplified by the Docker platform, has the potential to solve the problems associated with sharing software. We propose bioboxes: containers with standardised interfaces to make bioinformatics software interchangeable.",
+			issn="2047-217X",
+			doi="10.1186/s13742-015-0087-0",
+			url="http://dx.doi.org/10.1186/s13742-015-0087-0"
+			}
+		</citation>
+	</citations>
+</tool>
