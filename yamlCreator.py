@@ -64,11 +64,7 @@ default
 	os.system(command)
 
 def test():
-	arguments["fastq"] = os.path.abspath("myReadFolder/reads.fq.gz")
-	arguments["id"] = "TEST"
-	arguments["fasta"] = "myTestResult.fa"
-
-
+	arguments["testoutput"] = arguments["output"]
 	assemblers = ["bioboxes/velvet",
 				  "bioboxes/megahit",
 				  "bioboxes/sga",
@@ -79,36 +75,17 @@ def test():
 				  "bioboxes/soap"]
 
 	for assembler in assemblers:
-		arguments["output"] = os.path.abspath("test/"+assembler)
-		arguments["yaml"] = arguments["output"]+"/biobox.yaml"
+		arguments["assembler"] = assembler
+		arguments["output"] = arguments["testoutput"] + "/" + assembler
+
 		#IF output folder does not exist yet...
 		if not os.path.isdir(arguments["output"]):
 			os.makedirs(arguments["output"])
 
-		arguments["assembler"] = assembler
-		arguments["type"] = "single"
-		yamlCreator()
-		runDocker()
-
-	for assembler in assemblers:
-		arguments["output"] = os.path.abspath("test/"+assembler)
-		arguments["yaml"] = arguments["output"]+"/biobox.yaml"
-		#IF output folder does not exist yet...
-		if not os.path.isdir(arguments["output"]):
-			os.makedirs(arguments["output"])
-
-		arguments["assembler"] = assembler
-		arguments["type"] = "paired"
 		yamlCreator()
 		runDocker()
 
 if __name__ == '__main__':
-	if "--test" in sys.argv:
-		print("PERFORMING TESTS")
-		test()
-		# soap needs fragment size
-		sys.exit()
-
 	if "--fastq" not in sys.argv:
 		print("--fastq FASTQ required")
 		sys.exit()
@@ -139,6 +116,14 @@ if __name__ == '__main__':
 	else:
 		arguments["id"] = sys.argv[sys.argv.index("--id")+1]
 
+
+
+	if "--test" in sys.argv:
+		print("PERFORMING TESTS")
+		test()
+		# soap needs fragment size
+		sys.exit()
+
 	if "--assembler" not in sys.argv:
 		print "Use --assembler to select your assembler"
 		print "Currently supported assemblers:"
@@ -153,7 +138,6 @@ if __name__ == '__main__':
 		print "To force your public docker use --force"
 		sys.exit()
 
-	assemblerSelection()
 	yamlCreator()
 	runDocker()
 
